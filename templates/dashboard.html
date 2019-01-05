@@ -4,11 +4,20 @@ Welcome,
 <br/>
 Asked Questions.
 <br/>
-{% for question in questions %}
-<li>{{question.title}}</li>
-{% endfor %}
+{% if questions %}
+    {% for question in questions %}
+        <li>{{question.title}}</li>
+    {% endfor %}
+{% else %}
+    <h1>You have not created any questions yet</h1>
+{% endif %}
+
 <br/>
 Answers.
-{% for answer in answers %}
-<li>{{answer.answer_text}} by {{answer.user.username}} </li>
-{% endfor %}
+{% if answers %}
+    {% for answer in answers %}
+        <li>{{answer.answer_text}} by {{answer.user.username}} </li>
+    {% endfor %}
+    {% else %}
+    <h2>This question has not been answered yet.</h2>
+{% endif %}

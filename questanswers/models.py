@@ -7,11 +7,12 @@ from django.utils.text import slugify
 class Question(models.Model):
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True)
+
     title = models.TextField()
     group = models.ForeignKey('GroupQuestions', on_delete=models.CASCADE, blank=True, null=True)
     created_on = models.DateTimeField(auto_now=True)
     updated_on = models.DateTimeField(auto_now_add=True)
-    slug = models.SlugField()
+    slug = models.SlugField(blank=True, null=True)
 
     def save(self, *args, **kwargs):
         if not self.slug:
