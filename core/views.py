@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, reverse, HttpResponseRedirect, render_to_response
 from django.contrib.auth.hashers import make_password
-from django.views.generic import FormView
+from django.views.generic import FormView, ListView
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import authenticate
@@ -13,6 +13,11 @@ from .forms import RegisterForm, LoginForm
 
 
 # Create your views here.
+
+
+class QuestionList(ListView):
+
+    queryset = Question.objects.all()
 
 
 class DashboardView(FormView):
@@ -59,39 +64,36 @@ class LoginView(FormView):
     content = {}
     content['form'] = LoginForm
 
-    @ method_decorator(csrf_exempt)
+    @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
-        return super(LoginView, self).dispatch(self, request, *args, **kwargs)
+        return super(LoginView, self).dispatch(request, *args, **kwargs)
 
     def get(self, request, *args, **kwargs):
         content = {}
         if request.user.is_authenticated:
             return redirect(reverse('dashboard-view'))
-        else:
-            return render(request, 'login.html', content)
+        content['form'] = LoginForm
+        return render(request, 'login.html', content)
 
-
-    def post(self, request):
-
+    def post(self, request, *args, **kwargs):
         content = {}
         email = request.POST['email']
         password = request.POST['password']
-
         try:
             users = User.objects.filter(email=email)
-            user = authenticate(request, username=users.firsts().username, password=password)
+            user = authenticate(request, username=users.first().username, password=password)
             login(request, user)
             return redirect(reverse('dashboard-view'))
         except Exception as e:
             content = {}
             content['form'] = LoginForm
-            content['error'] = 'Unable to login with provided credentials' + e
-            return render_to_response( 'login.html', content)
+            content['error'] = 'Unable to login with provided credentials' + str(e)
+            return render_to_response('login.html', content)
 
 
 class LogoutView(FormView):
 
     def get(self, request):
         logout(request)
-        HttpResponseRedirect('/')
+        return HttpResponseRedirect('/core/login/')
 
